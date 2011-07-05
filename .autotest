@@ -1,0 +1,5 @@
+require 'test_notifier/runner/autotest'
+require 'autotest/restart'
+require 'autotest/timestamp'
+
+
