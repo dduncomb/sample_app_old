@@ -1,4 +1,18 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id                 :integer         not null, primary key
+#  name               :string(255)
+#  email              :string(255)
+#  created_at         :datetime
+#  updated_at         :datetime
+#  encrypted_password :string(255)
+#  salt               :string(255)
+#
+
 require 'spec_helper'
+
 
 describe User do
   before(:each) do
@@ -62,11 +76,13 @@ describe User do
   
   describe "password validations" do
 		it "should require a password" do
-			User.new(@attr.merge(:password => "", :password_confirmation => "")).should_not be_valid			
+			User.new(@attr.merge(:password => "", :password_confirmation => "")).
+				should_not be_valid			
 		end
 		
 		it "should require a matching password confirmation" do
-			User.new(@attr.merge(:password_confirmation => "invalid")).should_not be_valid
+			User.new(@attr.merge(:password_confirmation => "invalid")).
+				should_not be_valid
 		end
 		
 		it "should reject short passwords" do
@@ -125,17 +141,3 @@ describe User do
 		end
 	end	  
 end
-
-
-
-# == Schema Information
-#
-# Table name: users
-#
-#  id         :integer         not null, primary key
-#  name       :string(255)
-#  email      :string(255)
-#  created_at :datetime
-#  updated_at :datetime
-#
-
