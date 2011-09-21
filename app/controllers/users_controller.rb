@@ -5,18 +5,22 @@ class UsersController < ApplicationController
 		@title = @user.name
 	end
   
-  def new
+  def new                           # form_for helper in new.html.erb expects @user to be populated
   	@user = User.new
   	@title = "Sign up"
   end
 
-	def create
+	def create                       # the users resource (in routes.rb) ensures a POST request
+                                   # to /users is handled by the create action (RESTful named route)
 		@user = User.new(params[:user])
 		if @user.save
-			flash[:success] = "Welcome to the Sample App!"
+      sign_in @user                # auto sign-in after successful create
+			flash[:success] = "Welcome to the Sample App!" # flash is global; this is rendered in app layout
 			redirect_to @user			
-		else
+		else                          # do not pass go! do not collect $200! Back to sign up page...
 			@title = "Sign up"
+      @user.password = ''
+      @user.password_confirmation = ''
 			render 'new'
 		end
 	end

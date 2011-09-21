@@ -18,4 +18,5 @@ group :test do
   gem 'webrat', '0.7.3'
   gem 'spork', '~> 0.9.0.rc'
 	gem 'factory_girl_rails'
+  gem 'rcov'
 end
