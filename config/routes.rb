@@ -1,6 +1,41 @@
 SampleApp::Application.routes.draw do
 
-  get "sessions/new"
+# pages controller ---------------------------------------------------------------
+
+# Previously, we used (for example) get “pages/home”, which was inserted into routes.rb
+# automatically by the command: rails generate controller Pages home contact
+# This maps get requests for URL /pages/home (implicitly) to the home action in the Pages controller
+
+# get "pages/home"
+# get "pages/contact"
+#	get "pages/about"
+#	get "pages/help"
+
+# Now, we introduce named routes as a replacement
+# Generally these are referred to in the layout as an argument to the "link_to" helper method
+
+# Consider the about custom route (shown below).  This gives us the named routes
+# about_path (url: /about) and about_url (url: http://localhost:3000/about)
+
+match '/contact', :to => 'pages#contact'
+match '/about',  :to => 'pages#about'
+match '/help',    :to => 'pages#help'
+
+# special case
+# this code maps the root URL / to /pages/home, and also gives the URL helpers as follows:
+# root_path => '/'
+# root_url => 'http://localhost:3000'
+root :to => 'pages#home'
+
+#note: the helper link_to now can use named routes, e.g. root_path or contact_path etc.
+
+
+# users controller ---------------------------------------------------------------
+
+# Again, the controller generation bestowed us the following, which we replaced below
+# this time with the users resource + one custom route
+
+#get "users/new"
 
 #When following REST principles, resources are typically referenced using the resource name
 #and a unique identifier. What this means in the context of users—which we’re now thinking
@@ -10,8 +45,8 @@ SampleApp::Application.routes.draw do
 
 # to get users/1 to work, for example, add users as a resource with the following line
 resources :users
-# complete list of named routes created by the users resource:
 
+# complete list of named routes created by the users resource:
 
 #HTTP request	  URL	          Action	    Named route	      Purpose
 #=====================================================================================
@@ -23,50 +58,40 @@ resources :users
 #PUT	          /users/1	    update	    user_path(1)	    update user with id 1
 #DELETE	        /users/1	    destroy	    user_path(1)	    delete user with id 1
 
-resources :sessions, :only => [:new, :create, :destroy]
+# custom route for users controller
+match '/signup', :to => 'users#new'
+
+
+# sessions controller ---------------------------------------------------------------
+
+# Again, the controller generation bestowed us the following, which we replaced below
+# this time with the sessions resource + two custom routes
+
+#  get "sessions/new"
+
+# RESTful convention uses new for signin page, create to complete the signin, and
+# destroy to delete sessions ie signout
+
+# add a sessions resource
+resources :sessions, :only => [:new, :create, :destroy]   # limit the actions created
+
+# custom routes for sessions controller
+match '/signin',  :to => 'sessions#new'
+match '/signout', :to => 'sessions#destroy'
+
+
+# complete list of named routes created by the sessions resource + custom routes:
+
+# provided by the sessions resource (above) and custom routes (below)
+#HTTP request	  URL	          Action	    Named route	      Purpose
+#=====================================================================================
+#GET            /signin	      new	        signin_path	      page for a new session (signin)
+#POST	          /sessions	    create	    sessions_path	    create a new session
+#DELETE	        /signout	    destroy	    signout_path	    delete a session (sign out)
 
 
 
-#Previously, we used  get “pages/home”, which was inserted into routes.rb
-#automatically by the command: rails generate controller Pages home contact
-#This maps get requests for URL /pages/home (implicitly) to the home action in the Pages controller
 
-# get "pages/home"
-# get "pages/contact"
-#	get "pages/about"
-#	get "pages/help"
-
-# Now, below we introduce named routes
-# generally these are referred to in the layout as an argument to the "link_to" helper method
-# e.g. about_path and about_url are named routes
-
-
-# signup_path => '/signup'
-# signup_url => 'http://localhost:3000/about'
-match '/signup', :to => 'users#new'          # match '/signup' in URL and route to about action in Pages controller
-match '/contact', :to => 'pages#contact'
-match '/about',  :to => 'pages#about'
-match '/help',    :to => 'pages#help'
-
-
-# sessions controller named routes
-  match '/signin',  :to => 'sessions#new'       # RESTful convention uses new for signin page, create
-                                                # to complete the signin, and destroy to delete sessions
-                                                # ie signout
-  match '/signout', :to => 'sessions#destroy'
-
-
-
-# special case
-# this code maps the root URL / to /pages/home, and also gives the URL helpers as follows:
-# root_path => '/'
-# root_url => 'http://localhost:3000'
-root :to => 'pages#home'
-
-#note: the helper link_to now can use named routes, e.g. root_path or contact_path etc.
-
-
-#get "users/new"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

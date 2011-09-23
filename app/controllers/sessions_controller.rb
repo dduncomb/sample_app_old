@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
   def new
-    @title = "Sign in"
+    @title = "Sign in"    # no session model for form_for helper - note different syntax
+                          # in sesssions/new.html.erb
   end
 
   def create
@@ -9,6 +10,8 @@ class SessionsController < ApplicationController
 
     if user.nil?
       # Create an error message and re-render the signin form
+      # flash.now (instead of just flash used with redirect) otherwise persists for 1 request
+      # remember this is rendered by the layout
       flash.now[:error] = "Invalid email/password combination"
       @title = "Sign in"
       render 'new'

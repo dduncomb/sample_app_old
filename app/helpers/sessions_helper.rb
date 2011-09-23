@@ -10,7 +10,7 @@ module SessionsHelper
     #
     #In particular, since we went to the trouble of creating a secure salt, we
     #can re-use that value here to sign the remember token. Under the hood,
-    #using permanent causes Rails to set the expiration to 20.years.from_now, and
+    #using permanent causes Rails to set the expiration to 20.years.from_now (Rails extension call), and
     #signed makes the cookie secure, so that the user’s id is never exposed in the browser.
 
     cookies.permanent.signed[:remember_token] = [user.id, user.salt]
@@ -26,7 +26,7 @@ module SessionsHelper
     @current_user = user
   end
 
-  def current_user
+  def current_user              # @current_user in itself not sufficient - call to use cookie to authenticate
     @current_user ||= user_from_remember_token       # optimization technique to avoid repeated calls
   end
 

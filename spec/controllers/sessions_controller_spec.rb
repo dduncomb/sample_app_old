@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe SessionsController do
-  render_views
+  render_views          # required by e.g. have_selector tag
 
   describe "GET 'new'" do
     it "should be successful" do
-      get 'new'
+      get :new
       response.should be_success
     end
 
@@ -66,8 +66,8 @@ describe SessionsController do
   describe "DELETE 'destroy'" do
 
     it "should sign a user out" do
-      test_sign_in(Factory(:user))
-      delete :destroy       # send HTTP request DELETE, action destroy
+      test_sign_in(Factory(:user))        # sign in a user inside of a test defined in spec_helper.rb
+      delete :destroy       # send HTTP request DELETE, action destroy (actually no real DELETE in HTTP, done by javascript)
       controller.should_not be_signed_in
       response.should redirect_to(root_path)
     end

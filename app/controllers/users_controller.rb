@@ -6,7 +6,7 @@ class UsersController < ApplicationController
 	end
   
   def new                           # form_for helper in new.html.erb expects @user to be populated
-  	@user = User.new
+  	@user = User.new                # user object (active record object), used w/ form_for helper
   	@title = "Sign up"
   end
 

@@ -32,8 +32,8 @@ Spork.prefork do
 		# instead of true.
 		config.use_transactional_fixtures = true
 
-    def test_sign_in(user)
-      controller.sign_in(user)
+    def test_sign_in(user)          # used by sessions_controller_spec successfully
+      controller.sign_in(user)      # NB: doesn't work inside integration tests for some reason
     end
 
 	end

@@ -26,6 +26,11 @@ describe "LayoutLinks" do                     # integration test for testing rou
     response.should have_selector('title', :content => "Sign up")
   end  	
 
+  it "should have a signin page at '/signin'" do
+    get '/signin'
+    response.should have_selector('title', :content => "Sign in")
+  end
+
 # this integration test so far tests the routing, but doesn't actually
 # check that the links on the layout go to the right pages.
 # visit and click_link fix this!   these are webrat methods
@@ -49,8 +54,6 @@ describe "LayoutLinks" do                     # integration test for testing rou
       visit root_path
       response.should have_selector("a", :href => signin_path,
                                          :content => "Sign in")
-
-
     end
   end
 
@@ -58,9 +61,9 @@ describe "LayoutLinks" do                     # integration test for testing rou
 
     before(:each) do
       @user = Factory(:user)
-      visit signin_path
-      fill_in :email,    :with => @user.email
-      fill_in :password, :with => @user.password
+      visit signin_path                               # test_sign_in method in spec_helper does not work
+      fill_in :email,    :with => @user.email         # inside integration tests, so visit and submit
+      fill_in :password, :with => @user.password      # valid email/password pair like this
       click_button
     end
 
