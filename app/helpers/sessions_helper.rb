@@ -39,14 +39,14 @@ module SessionsHelper
     current_user = nil
   end
 
-  def deny_access
+  def deny_access     # generic method - so placed here in the sessions helper for the whole app
     # passing the options hash to the redirect_to method is a shortcut for the commented-out code below
     # together with :success and :error, :notice key is the final of all flash styles
     # which are supported natively by Blueprint CSS
 
     #flash[:notice] = "Please sign in to access this page."
     #redirect_to signin_path
-    store_location
+    store_location            # friendly forwarding
     redirect_to signin_path, :notice => "Please sign in to access this page."
 
   end
@@ -77,7 +77,7 @@ module SessionsHelper
 
     def store_location
       #session facility provided by Rails like an instance of cookies variable
-      session[:return_to] = request.fullpath
+      session[:return_to] = request.fullpath   # store path they're trying to get to
     end
 
     def clear_return_to

@@ -122,7 +122,7 @@ describe UsersController do
     end
 
     it "should be successful" do
-      get :edit, :id => @user
+      get :edit, :id => @user         # the edit action needs the id in the url...
       response.should be_success
     end
 
@@ -134,7 +134,7 @@ describe UsersController do
     it "should have a link to change the Gravatar" do
       get :edit, :id => @user
       gravatar_url = "http://gravatar.com/emails"
-      response.should have_selector("a", :href => gravatar_url,
+      response.should have_selector("a", :href => gravatar_url,    # a for anchor tag
                                          :content => "change")
     end
 
@@ -181,6 +181,16 @@ describe UsersController do
         @user.reload
         @user.name.should == @attr[:name]
         @user.email.should == @attr[:email]
+
+        # the below code is an alternative
+        # effectively it uses the assigns method to get the user object from the controller
+        # then compares it with the factory user object created in this spec
+
+        #user = assigns(:user)
+        #@user.reload
+        #@user.name.should == user.name
+        #@user.email.should == user.email
+        #@user.encrypted_password.should == user.encrypted_password
       end
 
       it "should redirect to the user show page" do
@@ -204,10 +214,11 @@ describe UsersController do
       it "should deny access to 'edit'" do
         get :edit, :id => @user
         response.should redirect_to(signin_path)
+        flash[:notice].should =~ /sign in/i
       end
 
       it "should deny access to 'update'" do
-        put :update, :id => @user, :user => { }
+        put :update, :id => @user, :user => { }       # need bare hash to satisfy route, but otherwise useless
         response.should redirect_to(signin_path)
       end
 
@@ -227,7 +238,7 @@ describe UsersController do
       end
 
       it "should requirematching users for 'update'" do
-        put :update, :id => @user, :user => { } # attempt put action when logged in as wrong_user
+        put :update, :id => @user, :user => {} # attempt put action when logged in as wrong_user
         response.should redirect_to(root_path)
       end
 
@@ -290,6 +301,22 @@ describe UsersController do
         response.should have_selector("a", :href => "/users?page=2",
                                            :content => "Next")
       end
+
+      it "should have delete links for admins" do
+        @user.toggle!(:admin)
+        other_user = User.all.second
+        get :index
+        response.should have_selector("a", :href => user_path(other_user),
+                                           :content => "delete")
+      end
+
+      it "should not have delete links for non-admins" do
+        other_user = User.all.second
+        get :index
+        response.should_not have_selector("a", :href => user_path(other_user),
+                                           :content => "delete")
+      end
+
     end
   end
 
@@ -316,9 +343,9 @@ describe UsersController do
 
     describe "as an admin user" do
       before(:each) do
-        admin = Factory(:user, :email => "admin@example.com", :admin => true) # user factories not bound by rules
+        @admin = Factory(:user, :email => "admin@example.com", :admin => true) # user factories not bound by rules
                                                                               # of attr_accessible so we can pass
-        test_sign_in(admin)
+        test_sign_in(@admin)
       end
 
       it "should destroy the user" do
@@ -332,6 +359,11 @@ describe UsersController do
         response.should redirect_to(users_path)
       end
 
+      it "should not be able to destroy itself" do
+        lambda do
+          delete :destroy, :id => @admin
+        end.should_not change(User, :count)
+      end
     end
 
   end

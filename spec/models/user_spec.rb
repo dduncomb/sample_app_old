@@ -147,12 +147,14 @@ describe User do
       @user = User.create!(@attr)
     end
 
-    it "should respond to admin" do
+    it "should respond to admin" do         # ie a user should have an admin attribute
       @user.should respond_to(:admin)
     end
 
     it "should not be an admin by default" do
-      @user.should_not be_admin       # implies user should have admin? predicate method
+      # implies user should have admin? predicate method
+      # (this method is provided automatically with the admin boolean attribute from the migration file)
+      @user.should_not be_admin
     end
 
     it "should be convertible to an admin" do

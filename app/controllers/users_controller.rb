@@ -45,9 +45,9 @@ class UsersController < ApplicationController
 
   def update
     # @user = User.find(params[:id])  # this is now refactored into the before filter "correct_user"
-    if @user.update_attributes(params[:user])
+    if @user.update_attributes(params[:user])    # user hash correct hash to update attributes
       flash[:success] = "Profile updated."
-      redirect_to @user
+      redirect_to @user                         # redirect back to the user's profile
     else
       @title = "Edit user"
       render 'edit'
@@ -73,7 +73,9 @@ class UsersController < ApplicationController
     end
 
     def admin_user
-      redirect_to(root_path) unless current_user.admin?      # go back to root if non-admin attempts deletion
+      # go back to root if non-admin attempts deletion OR if admin attempts to delete self
+      user =   User.find(params[:id])
+      redirect_to(root_path) unless (current_user.admin? && !current_user?(user))
     end
 
 end
