@@ -90,7 +90,15 @@ match '/signout', :to => 'sessions#destroy'
 #DELETE	        /signout	    destroy	    signout_path	    delete a session (sign out)
 
 
+# add a microposts resource
+resources :microposts, :only => [:create, :destroy]
 
+
+# complete list of named routes created by the microposts resource
+#HTTP request	  URL	          Action	    Named route	      Purpose
+#=====================================================================================
+#POST	          /microposts   create	    microposts_path	    create a new micropost
+#DELETE	        /microposts/1 destroy	    microposts_path(1)  delete micropost with id 1
 
 
   # The priority is based upon order of creation:

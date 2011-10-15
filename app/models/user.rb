@@ -9,6 +9,7 @@
 #  updated_at         :datetime
 #  encrypted_password :string(255)
 #  salt               :string(255)
+#  admin              :boolean         default(FALSE)
 #
 class User < ActiveRecord::Base
 	attr_accessor :password   # virtual attribute - no corresponding table column in db
@@ -22,6 +23,8 @@ class User < ActiveRecord::Base
                         # note that encrypted_password is introduced as a db column with the migration
                         # add_password_to_users.rb, however we do not want it updated directly
                         # and thus it is not supplied as parameter to attr_accessible
+
+  has_many :microposts, :dependent => :destroy
 
 	email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 	
@@ -67,7 +70,14 @@ class User < ActiveRecord::Base
     (user && user.salt == cookie_salt) ? user : nil   # compare this ternary operator with authenticate method
   end
 
-	
+	def feed
+    # This is preliminary.  See Chapter 12 for the full implementation
+    # the question mark here ensures that id is properly escaped before inclusion in
+    # underlying SQL query to prevent SQL injection attack (even though an integer in this case)
+    Micropost.where("user_id = ?", id)
+  end
+
+
 	private
 		
 		def encrypt_password
@@ -92,3 +102,5 @@ class User < ActiveRecord::Base
 		end
 		
 end
+
+

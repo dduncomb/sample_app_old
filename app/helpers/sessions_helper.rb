@@ -39,6 +39,11 @@ module SessionsHelper
     current_user = nil
   end
 
+  def authenticate                 # refactored - method originally found in users controller
+    deny_access unless signed_in?
+  end
+
+
   def deny_access     # generic method - so placed here in the sessions helper for the whole app
     # passing the options hash to the redirect_to method is a shortcut for the commented-out code below
     # together with :success and :error, :notice key is the final of all flash styles

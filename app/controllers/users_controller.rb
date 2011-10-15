@@ -15,6 +15,7 @@ class UsersController < ApplicationController
 
 	def show
 		@user = User.find(params[:id])
+    @microposts = @user.microposts.paginate(:page => params[:page])
 		@title = @user.name
 	end
   
@@ -63,9 +64,13 @@ class UsersController < ApplicationController
 
   private
 
-    def authenticate
-      deny_access unless signed_in?
-    end
+    # below method refactored to sessions_helper.rb - access to sessions helper
+    # methods only in views by default; however we have included the sessions_helper
+    # in the application controller - and thus inherit it here
+
+    #def authenticate
+    #  deny_access unless signed_in?
+    #end
 
     def correct_user
       @user = User.find(params[:id])
