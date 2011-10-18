@@ -3,12 +3,13 @@ class MicropostsController < ApplicationController
   before_filter :authorized_user, :only => :destroy
 
   def create
+     # create micropost thru the association (not thru new) so it has the correct user id
      @micropost = current_user.microposts.build(params[:micropost])
     if @micropost.save
       flash[:success] = "Micropost created!"
       redirect_to root_path
     else
-      @feed_items = []  # fix error on failed micropost submission
+      @feed_items = []  # fix error on failed micropost submission (no microposts will be listed on error)
       render 'pages/home'
     end
   end

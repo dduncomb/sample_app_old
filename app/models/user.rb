@@ -24,7 +24,35 @@ class User < ActiveRecord::Base
                         # add_password_to_users.rb, however we do not want it updated directly
                         # and thus it is not supplied as parameter to attr_accessible
 
-  has_many :microposts, :dependent => :destroy
+  has_many :microposts, :dependent => :destroy          # destroy microposts when user is destroyed
+  has_many :relationships, :foreign_key => "follower_id",  # foreign key needs to be explicit
+                                                          # when convention <class_id> not used
+                                                          # (e.g. user_id in microposts table)
+                           :dependent => :destroy         # destroy rships when user is destroyed
+
+  # here the has_many association does not actually refer to a model!
+  # in this case, we specify the association to be through another model (relationships)instead.
+
+  # instead of convention has_many :followeds, we change to the more natural has_many :following
+  # but pay the price with the additional :source specification
+
+  # also with this addition, the user model now responds to method :following
+  has_many :following, :through => :relationships, :source => :followed
+
+
+  # now we exploit the underlying assymetry between followers and following to simulate a
+  # reverse_relationships table by passing followed_id as the foreign key and also
+  # by explicitly referring to class name Relationship (otherwise rails looks for a
+  # ReverseRelationship class - which doesn't exist)
+
+  has_many :reverse_relationships, :foreign_key => "followed_id",
+                                   :class_name => "Relationship",
+                                   :dependent => :destroy
+
+  # note that here, source is optional as rails will automatically look for foreign key
+  # follower_id in this case
+  has_many :followers, :through => :reverse_relationships, :source => :follower
+
 
 	email_regex = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 	
@@ -48,7 +76,19 @@ class User < ActiveRecord::Base
 		# submitted_password (recall, encrypted_password, like salt, can be accessed directly from db like this)
 		encrypted_password == encrypt(submitted_password)
 	end
-	
+
+  def feed
+    # This is preliminary.  See Chapter 12 for the full implementation
+
+    #  self.microposts will not generalize here - so use alternative syntax
+    #  to make a Micropost find...the where method makes an SQL call to the database
+    # for the micropost active record with the given parameter
+    #
+    # the question mark here ensures that id is properly escaped before inclusion in
+    # underlying SQL query to prevent SQL injection attack (even though an integer in this case)
+    Micropost.where("user_id = ?", id)
+  end
+
 	def self.authenticate(email, submitted_password)
 		user = find_by_email(email)
 		return nil if user.nil?
@@ -70,11 +110,18 @@ class User < ActiveRecord::Base
     (user && user.salt == cookie_salt) ? user : nil   # compare this ternary operator with authenticate method
   end
 
-	def feed
-    # This is preliminary.  See Chapter 12 for the full implementation
-    # the question mark here ensures that id is properly escaped before inclusion in
-    # underlying SQL query to prevent SQL injection attack (even though an integer in this case)
-    Micropost.where("user_id = ?", id)
+  def following?(followed)
+    relationships.find_by_followed_id(followed)
+  end
+
+  def follow!(followed)
+    relationships.create!(:followed_id => followed.id)   # followed_id is in attr_accessible and
+                                                        # was created when the relationship model
+                                                        # was generated
+  end
+
+  def unfollow!(followed)
+    relationships.find_by_followed_id(followed).destroy
   end
 
 
