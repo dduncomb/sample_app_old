@@ -2,7 +2,9 @@ class UsersController < ApplicationController
 
   # before filter arranges for a  particular method to be called before the given actions
   # actions index, edit, update, destroy require user to be signed in
-  before_filter :authenticate, :only => [:index, :edit, :update, :destroy]
+  # note that after the following and followers actions were added, it became easier
+  # to use the :except option for authenticate before filter
+  before_filter :authenticate, :except => [:show, :new, :create]
   before_filter :correct_user, :only => [:edit, :update]
   before_filter :admin_user,   :only => :destroy
 
@@ -61,6 +63,24 @@ class UsersController < ApplicationController
     flash[:success] = "User destroyed"
     redirect_to users_path
   end
+
+  # these additional actions were defined when the users resource in routes was updated with
+  # a member method
+
+  def following
+    @title = "Following"
+    @user = User.find(params[:id])
+    @users = @user.following.paginate(:page => params[:page])
+    render 'show_follow'
+  end
+
+  def followers
+    @title = "Followers"
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(:page => params[:page])
+    render 'show_follow'
+  end
+
 
   private
 

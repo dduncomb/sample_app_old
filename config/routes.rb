@@ -43,8 +43,13 @@ root :to => 'pages#home'
 #to the URL /users/1. Here the show action is implicit in the type of request—when Rails’ REST
 #features are activated, GET requests are automatically handled by the show action.
 
-# to get users/1 to work, for example, add users as a resource with the following line
-resources :users
+# to get users/1 to work, for example, add users as a resource
+
+  resources :users do
+    member do
+      get :following, :followers
+    end
+  end
 
 # complete list of named routes created by the users resource:
 
@@ -57,6 +62,13 @@ resources :users
 #GET	          /users/1/edit	edit	      edit_user_path(1)	page to edit user with id 1
 #PUT	          /users/1	    update	    user_path(1)	    update user with id 1
 #DELETE	        /users/1	    destroy	    user_path(1)	    delete user with id 1
+
+# and the list of named routes created after the addition of the member method
+#HTTP request	  URL	                Action	    Named route
+#=====================================================================================
+#GET	          /users/1/following  following  following_user_path(1)
+#GET	          /users/1/followers  followers  followers_user_path(1)
+
 
 # custom route for users controller
 match '/signup', :to => 'users#new'
@@ -99,6 +111,15 @@ resources :microposts, :only => [:create, :destroy]
 #=====================================================================================
 #POST	          /microposts   create	    microposts_path	    create a new micropost
 #DELETE	        /microposts/1 destroy	    microposts_path(1)  delete micropost with id 1
+
+
+resources :relationships, :only => [:create, :destroy]
+
+# complete list of named routes created by the microposts resource
+#HTTP request	  URL	              Action	    Named route	            Purpose
+#=====================================================================================
+#POST	          /relationships    create	    relationships_path	    create a new relationship
+#DELETE	        /relationships/1  destroy	    relationships_path(1)   delete relationship with id 1
 
 
   # The priority is based upon order of creation:

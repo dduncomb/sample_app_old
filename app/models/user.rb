@@ -111,7 +111,7 @@ class User < ActiveRecord::Base
   end
 
   def following?(followed)
-    relationships.find_by_followed_id(followed)
+    relationships.find_by_followed_id(followed)     # idiom - arg converted into followed.id
   end
 
   def follow!(followed)
@@ -150,4 +150,19 @@ class User < ActiveRecord::Base
 		
 end
 
+
+
+# == Schema Information
+#
+# Table name: users
+#
+#  id                 :integer         not null, primary key
+#  name               :string(255)
+#  email              :string(255)
+#  created_at         :datetime
+#  updated_at         :datetime
+#  encrypted_password :string(255)
+#  salt               :string(255)
+#  admin              :boolean         default(FALSE)
+#
 

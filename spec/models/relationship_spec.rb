@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: relationships
+#
+#  id          :integer         not null, primary key
+#  follower_id :integer
+#  followed_id :integer
+#  created_at  :datetime
+#  updated_at  :datetime
+#
+
 require 'spec_helper'
 
 describe Relationship do
@@ -52,3 +63,5 @@ describe Relationship do
   end
 
 end
+
+
