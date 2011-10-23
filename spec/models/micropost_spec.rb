@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: microposts
+#
+#  id         :integer         not null, primary key
+#  content    :string(255)
+#  user_id    :integer
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 require 'spec_helper'
 
 describe Micropost do
@@ -48,17 +59,38 @@ describe Micropost do
 
   end
 
+  describe "from_users_followed_by" do
 
+    # build the associations in the before block and then check all three
+    # requirements: microposts for followed users and the user itself are
+    # included, but a post from an unfollowed user is not
+    before(:each) do
+      @other_user = Factory(:user, :email => Factory.next(:email))
+      @third_user = Factory(:user, :email => Factory.next(:email))
+
+      @user_post = @user.microposts.create!(:content => "foo")
+      @other_post = @other_user.microposts.create!(:content => "bar")
+      @third_post = @third_user.microposts.create!(:content => "baz")
+
+      @user.follow!(@other_user)
+    end
+
+    it "should have a from_users_followed_by class method" do
+      Micropost.should respond_to(:from_users_followed_by)
+    end
+
+    it "should include the followed user's microposts" do
+      Micropost.from_users_followed_by(@user).should include(@other_post)
+    end
+
+    it "should include the user's own microposts" do
+      Micropost.from_users_followed_by(@user).should include(@user_post)
+    end
+
+    it "should not include an unfollowed user's microposts" do
+      Micropost.from_users_followed_by(@user).should_not include(@third_post)
+    end
+  end
 end
 
-# == Schema Information
-#
-# Table name: microposts
-#
-#  id         :integer         not null, primary key
-#  content    :string(255)
-#  user_id    :integer
-#  created_at :datetime
-#  updated_at :datetime
-#
 

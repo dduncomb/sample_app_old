@@ -86,7 +86,9 @@ class User < ActiveRecord::Base
     #
     # the question mark here ensures that id is properly escaped before inclusion in
     # underlying SQL query to prevent SQL injection attack (even though an integer in this case)
-    Micropost.where("user_id = ?", id)
+    # Micropost.where("user_id = ?", id)  ## this line removed in favour of the below full implementation
+
+    Micropost.from_users_followed_by(self)
   end
 
 	def self.authenticate(email, submitted_password)
